@@ -10,8 +10,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://localhost:${env.PORT}/api/v1`,
-      description: 'Local development server',
+      url: `${env.NODE_ENV === 'production' ? env.BASE_URL_RENDER : env.BASE_URL }/api/v1`,
+      description: `${env.NODE_ENV === 'production' ? 'Production' : 'Development'} server`,
     },
   ],
   components: {

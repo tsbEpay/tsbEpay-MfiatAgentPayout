@@ -36,4 +36,7 @@ export const env = {
   SMTP_PASS: process.env.SMTP_PASS || '',
   EMAIL_FROM: process.env.EMAIL_FROM || '',
   KEEP_ALIVE_ENABLED: process.env.KEEP_ALIVE_ENABLED !== 'false',
+  BASE_URL: process.env.BASE_URL || '',
+  BASE_URL_RENDER: process.env.BASE_URL_RENDER || '',
+  BACKEND_URL: process.env.BACKEND_URL || '',
 }
