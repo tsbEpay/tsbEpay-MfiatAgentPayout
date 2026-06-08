@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mfiat_test
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Configure environment
+        run: |
+          echo "NODE_ENV=test" >> $GITHUB_ENV
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mfiat_test?schema=public" >> $GITHUB_ENV
+          echo "JWT_SECRET=test_jwt_secret" >> $GITHUB_ENV
+          echo "JWT_REFRESH_SECRET=test_refresh_secret" >> $GITHUB_ENV
+          echo "JWT_EXPIRES_IN=15m" >> $GITHUB_ENV
+          echo "JWT_REFRESH_EXPIRES_IN=7d" >> $GITHUB_ENV
+          echo "BCRYPT_ROUNDS=4" >> $GITHUB_ENV
+          echo "RATE_LIMIT_WINDOW_MS=900000" >> $GITHUB_ENV
+          echo "RATE_LIMIT_MAX=100" >> $GITHUB_ENV
+          echo "MAX_FILE_SIZE_MB=5" >> $GITHUB_ENV
+          echo "CLOUDINARY_CLOUD_NAME=" >> $GITHUB_ENV
+          echo "CLOUDINARY_API_KEY=" >> $GITHUB_ENV
+          echo "CLOUDINARY_API_SECRET=" >> $GITHUB_ENV
+
+      - name: Run database migrations
+        run: npx prisma migrate deploy
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Docker image
+        run: npm run docker:build

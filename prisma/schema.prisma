@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum KycStatus {
+  PENDING     
+  SUBMITTED   
+  APPROVED   
+  REJECTED  
+}
+
+enum DocumentType {
+  PASSPORT
+  DRIVERS_LICENSE
+}
+
+enum NotificationType {
+  KYC_SUBMITTED
+  KYC_APPROVED
+  KYC_REJECTED
+}
+
+
+model Agent {
+  id           String    @id @default(uuid())
+  firstName    String                         
+  lastName     String                        
+  email        String    @unique
+  phone        String    @unique              
+  gender       Gender
+  username     String    @unique
+  passwordHash String
+  pin          String?                         
+  referredBy   String?                         
+  country      String                       
+  kycStatus    KycStatus @default(PENDING)
+  isActive     Boolean   @default(true)
+  isPhoneVerified Boolean @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // relations
+  session      Session?
+  kyc          KycDocument?
+  otps         Otp[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([phone])
+  @@map("agents")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  agentId      String   @unique
+  refreshToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+
+model Otp {
+  id        String   @id @default(uuid())
+  agentId   String
+  code      String                        
+  purpose   String                      
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@map("otps")
+}
+
+
+model KycDocument {
+  id          String       @id @default(uuid())
+  agentId     String       @unique              // one KYC per agent
+
+  // ID document
+  docType     DocumentType
+  idNumber    String
+  issuedDate  DateTime
+  expiryDate  DateTime?                         // nullable — leave blank if N/A
+  frontUrl    String                            // uploaded front of ID
+  backUrl     String                            // uploaded back of ID
+  selfieUrl   String                            // passport photograph
+
+  // bank details
+  bankStatement   String                        // uploaded bank statement file
+  bankReceipt     String                        // uploaded sample receipt file
+  bankAccount     String                        // typed bank account number
+
+  // review
+  status      KycStatus @default(SUBMITTED)
+  reviewNote  String?                           // admin note on rejection
+  reviewedBy  String?                           // admin id
+  reviewedAt  DateTime?
+  submittedAt DateTime  @default(now())
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  @@map("kyc_documents")
+}
+
+
+model Notification {
+  id        String           @id @default(uuid())
+  agentId   String
+  type      NotificationType
+  title     String
+  body      String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, isRead])
+  @@map("notifications")
+}
