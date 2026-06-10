@@ -3,12 +3,15 @@ export interface JwtPayload {
   agentId: string
   sessionId: string
 }
+
+
 export interface AuthRequest extends Request {
   agent?: {
     agentId: string
     sessionId: string
   }
 }
+
 export interface ApiResponse<T = null> {
   success: boolean
   message: string
