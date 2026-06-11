@@ -60,7 +60,7 @@ const fetchRate = async (from: string, to: string): Promise<{ rate: number; date
         throw new AppError('Currency service timed out. Please try again', 504)
       }
     }
-    // rethrow AppErrors we raised above
+  
     if (err instanceof AppError) throw err
 
     throw new AppError('Failed to fetch exchange rate. Please try again', 502)
