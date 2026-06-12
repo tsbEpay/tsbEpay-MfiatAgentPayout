@@ -13,8 +13,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "types": ["node"]
+    "noUnusedLocals": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
