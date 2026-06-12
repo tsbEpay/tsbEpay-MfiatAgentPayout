@@ -6,7 +6,7 @@ import {
   validateRatesQuery,
 } from '../validators/agent/currencyValidator'
 
-const currencyRoutes = Router()
+const currencyRoutes = Router();
 
 
 currencyRoutes.use(authMiddleware)

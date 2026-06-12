@@ -5,8 +5,6 @@ import { ConversionResult, CurrencyFreaksResponse } from '../types/currency';
 
 const BASE_URL = 'https://api.currencyfreaks.com/v2.0'
 
-
-
 const fetchRate = async (from: string, to: string): Promise<{ rate: number; date: string }> => {
   const fromUpper = from.toUpperCase()
   const toUpper = to.toUpperCase()

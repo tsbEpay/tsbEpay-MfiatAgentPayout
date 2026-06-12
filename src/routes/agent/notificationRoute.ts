@@ -4,7 +4,8 @@ import * as notificationController from '../../controllers/agent/notificationCon
 
 const notificationRoutes = Router()
 
-notificationRoutes.use(authMiddleware)
+notificationRoutes.use(authMiddleware);
+
 notificationRoutes.get('/', notificationController.getNotifications)
 notificationRoutes.get('/unread-count', notificationController.getUnreadCount)
 notificationRoutes.get('/:notificationId', notificationController.getNotification)

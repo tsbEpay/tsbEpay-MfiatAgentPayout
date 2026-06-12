@@ -5,8 +5,7 @@ import * as kycController from '../../controllers/agent/kycController'
 import { kycUpload } from '../../utils/multer'
 import { reviewSchema } from '../../validators/agent/kycValidator'
 
-const kycRoutes = Router()
-
+const kycRoutes = Router();
 
 kycRoutes.use(authMiddleware)
 kycRoutes.post('/submit', kycUpload, kycController.submitKyc)
